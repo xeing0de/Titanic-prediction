@@ -8,6 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 
 train = pd.read_csv("train.csv")
 
@@ -64,4 +65,19 @@ clf.fit(x_train, y_train)
 y_pred = clf.predict(x_valid)
 
 val_accuracy = accuracy_score(y_valid, y_pred)
-print(f"Validation accuracy: {val_accuracy * 100:.2f}%")
+print(f"Validation accuracy(LogisticRegression): {val_accuracy * 100:.2f}%")
+
+clfF = Pipeline(steps=[
+    ("preprocess", preprocessor),
+    ("model", RandomForestClassifier(
+        n_estimators=100,
+        max_depth=6,
+        random_state=0,
+        n_jobs=-1))])
+
+clfF.fit(x_train, y_train)
+y_pred = clfF.predict(x_valid)
+
+val_accuracy = accuracy_score(y_valid, y_pred)
+print(f"Validation accuracy(RandomForest): {val_accuracy * 100:.2f}%")
+
