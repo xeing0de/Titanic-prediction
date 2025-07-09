@@ -17,6 +17,9 @@ print(train.head())
 print(train.info())
 print(train.describe())
 
+train["FamilySize"] = train["SibSp"] + train["Parch"] + 1
+train["IsAlone"] = (train["FamilySize"] == 1).astype(int)
+
 #SexSurvived plot
 sb.countplot(data=train, x="Survived", hue="Sex")
 plt.savefig("sexsur_plot.png")
@@ -35,14 +38,14 @@ print(train.corr(numeric_only=True))
 target = "Survived"
 features = ["Pclass","Sex", "Age",
             "SibSp", "Parch", "Fare",
-            "Embarked"]
+            "Embarked", "FamilySize", "IsAlone"]
 
 x = train[features]
 y = train[target]
 
 x_train, x_valid, y_train, y_valid = train_test_split(x, y, test_size=0.2, random_state=0, stratify=y)
 
-num_feat = ["Age","SibSp","Parch","Fare"]
+num_feat = ["Age","SibSp","Parch","Fare","FamilySize", "IsAlone"]
 cat_feat = ["Pclass","Sex","Embarked"]
 
 num_transformer = Pipeline(steps=[
@@ -70,7 +73,7 @@ print(f"Validation accuracy(LogisticRegression): {val_accuracy * 100:.2f}%")
 clfF = Pipeline(steps=[
     ("preprocess", preprocessor),
     ("model", RandomForestClassifier(
-        n_estimators=100,
+        n_estimators=50,
         max_depth=6,
         random_state=0,
         n_jobs=-1))])
